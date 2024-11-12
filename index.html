@@ -156,28 +156,31 @@
             }
         }
         
-        /* Ensure toggle button is hidden in desktop mode */
-@media (min-width: 1024px) { /* Adjust breakpoint as needed */
+       /* Apply these styles only for desktop screens */
+@media (min-width: 1024px) {
+    
     .toggle-btn, #toggle-button, .sidebar-toggle, .cross { /* Add more specific selectors if needed */
         display: none !important; /* Use !important to override other styles */
     }
-
-    /* Sidebar fixed to the right */
+    
+    /* Set a fixed width for the sidebar */
     .sidebar {
         width: 250px; /* Adjust as needed */
         position: fixed;
         top: 0;
         right: 0;
-        height: 100vh;
-        overflow-y: auto;
+        height: 100vh; /* Full height */
+        background-color: #f8f9fa; /* Optional background color */
     }
 
-    /* Main content margin adjustment for fixed sidebar */
+    /* Adjust the main content to avoid overlapping */
     .main-content {
-        margin-right: 260px; /* Adjust based on sidebar width */
+        margin-right: 260px; /* Slightly more than sidebar width */
         padding: 20px; /* Optional padding */
     }
 }
+
+   
         
         
     </style>
