@@ -155,6 +155,29 @@
                 width: 100%;
             }
         }
+        
+        /* Ensure toggle button is hidden in desktop mode */
+@media (min-width: 992px) { /* Adjust breakpoint as needed */
+    .toggle-btn, #toggle-button, .sidebar-toggle, .cross { /* Add more specific selectors if needed */
+        display: none !important; /* Use !important to override other styles */
+    }
+
+    /* Sidebar fixed to the right */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+
+    /* Main content margin adjustment for fixed sidebar */
+    .main-content {
+        margin-right: 250px; /* Adjust based on sidebar width */
+    }
+}
+        
+        
     </style>
 </head>
 <body>
@@ -188,7 +211,7 @@
 <div id="sidebar" class="sidebar">
     <div class="sidebar-header">
         <span>Question Navigator</span>
-        <button onclick="toggleSidebar()">✕</button>
+        <button class="cross" onclick="toggleSidebar()">✕</button>
     </div>
     <div class="question-grid" id="question-grid"></div>
     <button class="btn btn-primary w-100 mt-3" onclick="submitTest()">Submit Test</button>
@@ -414,7 +437,7 @@
         selectedAnswers.fill(null); // Clear selected answers
 
         // Reset timer
-        timeRemaining = 1 * 60;
+        timeRemaining = 12 * 60;
         document.getElementById('timer').textContent = "12:00"; // Reset timer display
         startTimer(); // Start the timer
 
