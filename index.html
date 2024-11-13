@@ -7,12 +7,15 @@
     <title>Professional Quiz Interface</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* General Styles */
-        body {
-            background-color: #f4f6f9;
-            font-family: Arial, sans-serif;
-            color: #333;
-        }
+        
+      /* General Styles */
+body {
+    background-color: #f4f6f9;
+    font-family: Arial, sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
         .container {
             max-width: 800px;
             margin-top: 20px;
@@ -156,37 +159,56 @@
             }
         }
         
-       /* Apply these styles only for desktop screens */
+
+/* Responsive adjustments for desktop */
 @media (min-width: 1024px) {
-    
-    .toggle-btn, #toggle-button, .sidebar-toggle, .cross { /* Add more specific selectors if needed */
-        display: none !important; /* Use !important to override other styles */
-    }
-    
-    /* Set a fixed width for the sidebar */
-    .sidebar {
-        width: 250px; /* Adjust as needed */
-        position: fixed;
-        top: 0;
-        right: 0;
-        height: 100vh; /* Full height */
-        background-color: #f8f9fa; /* Optional background color */
+    /* Use Flexbox for Main Layout */
+    .main-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+        padding: 0 20px; /* Add padding for left and right margins */
     }
 
-    /* Adjust the main content to avoid overlapping */
-    .main-content {
-        margin-right: 260px; /* Slightly more than sidebar width */
-        padding: 20px; /* Optional padding */
+    /* Center the Container between Sidebar and Left Edge */
+    .container {
+        max-width: calc(100% - 600px); /* Calculate width based on sidebar and padding */
+        margin: 20px auto; /* Center within allocated space */
+        padding: 20px;
+        box-sizing: border-box;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Sidebar fixed to the right */
+    .sidebar {
+        position: sticky;
+        top: 0;
+        margin-left: auto; /* Push sidebar to the right */
+        width: 300px; /* Specify a width for the sidebar */
+        height: 100vh;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        transition: right 0.4s ease;
+        box-shadow: -3px 0 10px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        z-index: 1000;
     }
 }
 
-   
-        
+/* Ensure toggle button is hidden in desktop mode */
+@media (min-width: 1024px) {
+    .toggle-btn, #toggle-button, .sidebar-toggle, .cross {
+        display: none !important;
+    }
+}
         
     </style>
 </head>
 <body>
-
+<div class="main-wrapper">
 <div class="container">
     <!-- Timer Bar -->
     <div class="timer-bar d-flex justify-content-between">
@@ -242,223 +264,267 @@
         </div>
     </div>
 </div>
-
+</div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-    // Sample Questions Data
-    const questions = [
-        { text: "What is the capital of France?", options: ["Paris", "Rome", "Madrid", "Berlin"], answer: 0 },
-        { text: "Which planet is known as the Red Planet?", options: ["Earth", "Venus", "Mars", "Jupiter"], answer: 2 },
-        { text: "What is the largest mammal in the world?", options: ["Elephant", "Blue Whale", "Great White Shark", "Giraffe"], answer: 1 },
-        { text: "Which element has the chemical symbol 'O'?", options: ["Gold", "Oxygen", "Osmium", "Oganesson"], answer: 1 },
-        { text: "What year did the Titanic sink?", options: ["1912", "1914", "1905", "1900"], answer: 0 },
-        { text: "What is the smallest prime number?", options: ["0", "1", "2", "3"], answer: 2 },
-        { text: "Who wrote 'Romeo and Juliet'?", options: ["Charles Dickens", "William Shakespeare", "Mark Twain", "Leo Tolstoy"], answer: 1 },
-        { text: "What is the powerhouse of the cell?", options: ["Nucleus", "Mitochondria", "Ribosome", "Endoplasmic Reticulum"], answer: 1 },
-        { text: "Which continent is known as the 'Dark Continent'?", options: ["Asia", "Africa", "Australia", "South America"], answer: 1 },
-        { text: "What is the boiling point of water?", options: ["100°C", "90°C", "80°C", "120°C"], answer: 0 }
-    ];
+ 
 
-    let currentQuestionIndex = 0;
-    let selectedOptionIndex = -1; // To track the selected option
-    const markedForReview = new Set(); // To track questions marked for review
-    const attemptedQuestions = new Set(); // To track attempted questions
-    const selectedAnswers = new Array(questions.length).fill(null); // Store selected answers
-    let timer; // Timer variable
+// Sample Questions Data
+const questions = [
+    { text: "What is the capital of France?", options: ["Paris", "Rome", "Madrid", "Berlin"], answer: 0 },
+    { text: "Which planet is known as the Red Planet?", options: ["Earth", "Venus", "Mars", "Jupiter"], answer: 2 },
+    { text: "What is the largest mammal in the world?", options: ["Elephant", "Blue Whale", "Great White Shark", "Giraffe"], answer: 1 },
+    { text: "Which element has the chemical symbol 'O'?", options: ["Gold", "Oxygen", "Osmium", "Oganesson"], answer: 1 },
+    { text: "What year did the Titanic sink?", options: ["1912", "1914", "1905", "1900"], answer: 0 },
+    { text: "What is the smallest prime number?", options: ["0", "1", "2", "3"], answer: 2 },
+    { text: "Who wrote 'Romeo and Juliet'?", options: ["Charles Dickens", "William Shakespeare", "Mark Twain", "Leo Tolstoy"], answer: 1 },
+    { text: "What is the powerhouse of the cell?", options: ["Nucleus", "Mitochondria", "Ribosome", "Endoplasmic Reticulum"], answer: 1 },
+    { text: "Which continent is known as the 'Dark Continent'?", options: ["Asia", "Africa", "Australia", "South America"], answer: 1 },
+    { text: "What is the boiling point of water?", options: ["100°C", "90°C", "80°C", "120°C"], answer: 0 }
+];
 
-    function loadQuestion(index) {
-        const question = questions[index];
-        document.getElementById('question').textContent = question.text;
-        const optionsContainer = document.getElementById('options');
-        optionsContainer.innerHTML = '';
+let currentQuestionIndex = 0;
+let selectedOptionIndex = -1; // To track the selected option
+const markedForReview = new Set(); // To track questions marked for review
+const attemptedQuestions = new Set(); // To track attempted questions
+const selectedAnswers = new Array(questions.length).fill(null); // Store selected answers
+let timer; // Timer variable
 
-        question.options.forEach((option, i) => {
-            const button = document.createElement('button');
-            button.className = 'option-btn';
-            button.textContent = option;
+function loadQuestion(index) {
+    const question = questions[index];
+    document.getElementById('question').textContent = question.text;
+    const optionsContainer = document.getElementById('options');
+    optionsContainer.innerHTML = '';
 
-            // Highlight the button if it was previously selected
-            if (selectedAnswers[index] === i) {
-                button.classList.add('selected');
-            }
+    question.options.forEach((option, i) => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.textContent = option;
 
-            button.onclick = () => selectOption(i);
-            optionsContainer.appendChild(button);
-        });
+        // Highlight the button if it was previously selected
+        if (selectedAnswers[index] === i) {
+            button.classList.add('selected');
+        }
+
+        button.onclick = () => selectOption(i);
+        optionsContainer.appendChild(button);
+    });
+
+    // Check if it's the last question to change the button text and functionality
+    const nextButton = document.getElementById('next-question');
+    if (index === questions.length - 1) {
+        nextButton.textContent = 'Submit';
+        nextButton.onclick = submitTest;
+    } else {
+        nextButton.textContent = 'Save & Next';
+        nextButton.onclick = nextQuestion;
     }
+}
 
-    function selectOption(optionIndex) {
-        clearSelectedAnswer();
-        const optionButtons = document.querySelectorAll('.option-btn');
-        optionButtons[optionIndex].classList.add('selected');
-        selectedOptionIndex = optionIndex; // Store the selected option index
-        attemptedQuestions.add(currentQuestionIndex); // Mark this question as attempted
-        selectedAnswers[currentQuestionIndex] = optionIndex; // Store the selected answer
-        updateGridStatus(currentQuestionIndex, 'status-attempted');
+function selectOption(optionIndex) {
+    clearSelectedAnswer();
+    const optionButtons = document.querySelectorAll('.option-btn');
+    optionButtons[optionIndex].classList.add('selected');
+    selectedOptionIndex = optionIndex; // Store the selected option index
+    // Mark this question as attempted when an option is selected
+    selectedAnswers[currentQuestionIndex] = optionIndex; // Store the selected answer
+    // When an option is selected, mark the question as attempted
+    attemptedQuestions.add(currentQuestionIndex);
+    updateGridStatus(currentQuestionIndex, 'status-attempted');
+}
+
+function markForReview() {
+    if (!markedForReview.has(currentQuestionIndex)) {
+        markedForReview.add(currentQuestionIndex);
+        updateGridStatus(currentQuestionIndex, 'status-marked');
     }
+    nextQuestion(); // Move to the next question
+}
 
-    function markForReview() {
+function clearSelectedAnswer() {
+    const selectedButtons = document.querySelectorAll('.option-btn.selected');
+    selectedButtons.forEach(button => {
+        button.classList.remove('selected');
+    });
+    // Clear the selected answer and remove from attempted questions
+    selectedAnswers[currentQuestionIndex] = null;
+    attemptedQuestions.delete(currentQuestionIndex);
+    updateGridStatus(currentQuestionIndex, 'status-unattempted');
+}
+
+function updateGridStatus(index, statusClass) {
+    const btn = document.getElementById(`q${index}`);
+    btn.className = statusClass;
+}
+
+function setupGrid() {
+    const questionGrid = document.getElementById('question-grid');
+    questionGrid.innerHTML = '';
+    questions.forEach((_, index) => {
+        const btn = document.createElement('button');
+        btn.id = `q${index}`;
+        btn.textContent = index + 1;
+
+        // Determine the class based on the question state
+        if (markedForReview.has(index)) {
+            btn.className = 'status-marked';
+        } else if (attemptedQuestions.has(index)) {
+            btn.className = 'status-attempted';
+        } else {
+            btn.className = 'status-unattempted';
+        }
+
+        btn.onclick = () => {
+            currentQuestionIndex = index;
+            loadQuestion(index);
+            toggleSidebar();
+        };
+        questionGrid.appendChild(btn);
+    });
+}
+
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("open");
+}
+
+// Timer function (simple countdown)
+let timeRemaining = 1 * 60;
+
+function startTimer() {
+    timer = setInterval(() => {
+        if (timeRemaining > 0) {
+            timeRemaining--;
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        } else {
+            clearInterval(timer);
+            submitTest(); // Automatically submit when time is up
+        }
+    }, 1000);
+}
+
+function nextQuestion() {
+    // If no answer was selected, mark the question as unattempted in red
+    if (selectedOptionIndex === -1) {
+        updateGridStatus(currentQuestionIndex, 'status-unattempted-red');
+    } else {
+        // Mark as attempted only if not marked for review
         if (!markedForReview.has(currentQuestionIndex)) {
-            markedForReview.add(currentQuestionIndex);
-            updateGridStatus(currentQuestionIndex, 'status-marked');
+            attemptedQuestions.add(currentQuestionIndex); // Mark this question as attempted
+            updateGridStatus(currentQuestionIndex, 'status-attempted');
         }
-        nextQuestion(); // Move to the next question
     }
 
-    function clearSelectedAnswer() {
-        const selectedButtons = document.querySelectorAll('.option-btn.selected');
-        selectedButtons.forEach(button => {
-            button.classList.remove('selected');
-        });
-    }
-
-    function updateGridStatus(index, statusClass) {
-        const btn = document.getElementById(`q${index}`);
-        btn.className = statusClass;
-    }
-
-    function setupGrid() {
-        const questionGrid = document.getElementById('question-grid');
-        questionGrid.innerHTML = '';
-        questions.forEach((_, index) => {
-            const btn = document.createElement('button');
-            btn.id = `q${index}`;
-            btn.textContent = index + 1;
-
-            // Determine the class based on the question state
-            if (markedForReview.has(index)) {
-                btn.className = 'status-marked';
-            } else if (attemptedQuestions.has(index)) {
-                btn.className = 'status-attempted';
-            } else {
-                btn.className = 'status-unattempted';
-            }
-
-            btn.onclick = () => {
-                currentQuestionIndex = index;
-                loadQuestion(index);
-                toggleSidebar();
-            };
-            questionGrid.appendChild(btn);
-        });
-    }
-
-    function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle("open");
-    }
-
-    // Timer function (simple countdown)
-    let timeRemaining = 1 * 60;
-
-    function startTimer() {
-        timer = setInterval(() => {
-            if (timeRemaining > 0) {
-                timeRemaining--;
-                const minutes = Math.floor(timeRemaining / 60);
-                const seconds = timeRemaining % 60;
-                document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            } else {
-                clearInterval(timer);
-                submitTest(); // Automatically submit when time is up
-            }
-        }, 1000);
-    }
-
-    function nextQuestion() {
-        // If no answer was selected, mark the question as unattempted in red
-        if (selectedOptionIndex === -1) {
-            updateGridStatus(currentQuestionIndex, 'status-unattempted-red');
-        }
-        
-        if (currentQuestionIndex < questions.length - 1) {
-            currentQuestionIndex++;
-            loadQuestion(currentQuestionIndex);
-        }
-        // Reset selectedOptionIndex for next question
-        selectedOptionIndex = -1;
-    }
-
-    function submitTest() {
-        // Stop the timer
-        clearInterval(timer);
-
-        // Calculate score and gather results
-        let score = 0;
-        const totalQuestions = questions.length;
-        const unansweredQuestions = totalQuestions - attemptedQuestions.size - markedForReview.size;
-        const wrongAnswersList = [];
-
-        questions.forEach((question, index) => {
-            if (markedForReview.has(index)) {
-                return; // Skip marked questions
-            }
-
-            if (attemptedQuestions.has(index)) {
-                if (selectedAnswers[index] !== question.answer) {
-                    wrongAnswersList.push({
-                        question: question.text,
-                        selectedAnswer: question.options[selectedAnswers[index]],
-                        correctAnswer: question.options[question.answer]
-                    });
-                    // Apply negative marking for incorrect answers
-                    score -= 0.5;
-                } else {
-                    score += 2; // Each correct answer is worth 2 points
-                }
-            }
-        });
-
-        // Show results in the modal
-        displayResults(score, totalQuestions, unansweredQuestions, wrongAnswersList);
-    }
-
-    function displayResults(score, totalQuestions, unansweredQuestions, wrongAnswersList) {
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.innerHTML = `
-            <h3>Your Score: ${score.toFixed(1)} out of ${totalQuestions * 2}</h3>
-            <p>Unanswered Questions: ${unansweredQuestions}</p>
-            <p>Marked for Review: ${markedForReview.size}</p>
-            <p>Wrong Answers: ${wrongAnswersList.length}</p>
-            <ul>
-                ${wrongAnswersList.map(answer => `
-                    <li>${answer.question} 
-                    <br>Your Answer: <span class="wrong-answer">${answer.selectedAnswer}</span> 
-                    <br>Correct Answer: <span class="correct-answer">${answer.correctAnswer}</span>
-                    </li>`).join('')}
-            </ul>
-        `;
-        $('#resultsModal').modal('show'); // Show the modal with the results
-    }
-
-    function restartQuiz() {
-        // Reset the quiz state and reload the first question
-        currentQuestionIndex = 0;
-        selectedOptionIndex = -1;
-        markedForReview.clear();
-        attemptedQuestions.clear();
-        selectedAnswers.fill(null); // Clear selected answers
-
-        // Reset timer
-        timeRemaining = 12 * 60;
-        document.getElementById('timer').textContent = "12:00"; // Reset timer display
-        startTimer(); // Start the timer
-
-        setupGrid();
+    if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
         loadQuestion(currentQuestionIndex);
     }
 
-    // Initialize
+    // Change the button to "Submit" on the last question
+    if (currentQuestionIndex === questions.length - 1) {
+        const nextButton = document.getElementById('next-question');
+        nextButton.textContent = 'Submit';
+        nextButton.onclick = submitTest; // Change functionality to submit the test
+    }
+
+    // Reset selectedOptionIndex for next question
+    selectedOptionIndex = -1;
+}
+
+function submitTest() {
+    // Stop the timer
+    clearInterval(timer);
+
+    // Calculate score and gather results
+    let score = 0;
+    let correctAnswersCount = 0; // Initialize correct answers count
+    const totalQuestions = questions.length;
+    const wrongAnswersList = [];
+
+    questions.forEach((question, index) => {
+        if (markedForReview.has(index)) {
+            return; // Skip marked questions
+        }
+
+        if (attemptedQuestions.has(index)) {
+            if (selectedAnswers[index] !== question.answer) {
+                wrongAnswersList.push({
+                    question: question.text,
+                    selectedAnswer: question.options[selectedAnswers[index]],
+                    correctAnswer: question.options[question.answer]
+                });
+                // Apply negative marking for incorrect answers
+                score -= 0.5; // Deduct 0.5 points for a wrong answer
+            } else {
+                score += 2; // Each correct answer is worth 2 points
+                correctAnswersCount++; // Increment correct answers count
+            }
+        }
+    });
+
+    const notAttemptedQuestionsCount = totalQuestions - attemptedQuestions.size - markedForReview.size;
+
+    // Show results in the modal
+    displayResults(score, totalQuestions, attemptedQuestions.size, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList);
+}
+
+function displayResults(score, totalQuestions, attemptedQuestionsCount, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList) {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = `
+        <h3>Your Score: ${score.toFixed(1)} out of ${totalQuestions * 2}</h3>
+        <p>Attempted Questions: ${attemptedQuestionsCount}</p>
+        <p>Not Attempted Questions: ${notAttemptedQuestionsCount}</p>
+        <p>Correct Answers: ${correctAnswersCount}</p>
+        <p>Marked for Review: ${markedForReview.size}</p>
+        <p>Wrong Answers: ${wrongAnswersList.length}</p>
+        <ul>
+            ${wrongAnswersList.map(answer => `
+                <li>${answer.question} 
+                <br>Your Answer: <span class="wrong-answer">${answer.selectedAnswer}</span> 
+                <br>Correct Answer: <span class="correct-answer">${answer.correctAnswer}</span>
+                </li>`).join('')}
+        </ul>
+    `;
+    $('#resultsModal').modal('show'); // Show the modal with the results
+}
+
+function restartQuiz() {
+    // Close the results modal
+    $('#resultsModal').modal('hide'); // This line will hide the modal
+
+    // Reset the quiz state and reload the first question
+    currentQuestionIndex = 0;
+    selectedOptionIndex = -1;
+    markedForReview.clear();
+    attemptedQuestions.clear();
+    selectedAnswers.fill(null); // Clear selected answers
+
+    // Reset timer
+    timeRemaining = 1 * 60; // Reset the timer to the initial time (e.g., 1 minute)
+    document.getElementById('timer').textContent = "1:00"; // Reset timer display
+    startTimer(); // Start the timer
+
     setupGrid();
     loadQuestion(currentQuestionIndex);
-    startTimer(); // Start the timer when the quiz begins
+}
 
-    // Add event listener for the buttons
-    document.getElementById('mark-review').onclick = markForReview;
-    document.getElementById('clear-answer').onclick = clearSelectedAnswer;
-    document.getElementById('next-question').onclick = nextQuestion;
+// Initialize
+setupGrid();
+loadQuestion(currentQuestionIndex);
+startTimer(); // Start the timer when the quiz begins
+
+// Add event listener for the buttons
+document.getElementById('mark-review').onclick = markForReview;
+document.getElementById('clear-answer').onclick = clearSelectedAnswer;
+document.getElementById('next-question').onclick = nextQuestion;
+
+
+
+
 </script>
 
 </body>
