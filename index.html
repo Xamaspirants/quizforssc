@@ -7,7 +7,7 @@
     <title>Professional Quiz Interface</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        
+        /* General Styles */
       /* General Styles */
 body {
     background-color: #f4f6f9;
@@ -138,6 +138,32 @@ body {
         .toggle-btn:hover {
             background-color: #0056b3;
         }
+        
+        
+        cross {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1100;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+    display: none; /* Initially hidden */
+}
+
+.cross:hover {
+    background-color: #0056b3;
+}
+        
+        
+        
+        
 
         /* Results Modal Styles */
         .correct-answer {
@@ -148,6 +174,11 @@ body {
             color: red;
             font-weight: bold;
         }
+
+
+
+
+
 
         /* Responsive adjustments */
         @media (max-width: 767px) {
@@ -232,16 +263,17 @@ body {
 </div>
 
 <!-- Toggle Button for Sidebar -->
-<button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+<button class="toggle-btn" id="toggle-btn" onclick="toggleSidebar()">☰</button>
 
 <!-- Sidebar Navigation Panel -->
 <div id="sidebar" class="sidebar">
     <div class="sidebar-header">
         <span>Question Navigator</span>
-        <button class="cross" onclick="toggleSidebar()">✕</button>
+        <button class="cross" id="cross-btn" onclick="toggleSidebar()">✕</button>
     </div>
     <div class="question-grid" id="question-grid"></div>
     <button class="btn btn-primary w-100 mt-3" onclick="submitTest()">Submit Test</button>
+    <button class="btn btn-primary w-100 mt-3" id="reattempt-button" style="display: none;">Reattempt Quiz</button>
 </div>
 
 <!-- Results Modal -->
@@ -292,6 +324,7 @@ const markedForReview = new Set(); // To track questions marked for review
 const attemptedQuestions = new Set(); // To track attempted questions
 const selectedAnswers = new Array(questions.length).fill(null); // Store selected answers
 let timer; // Timer variable
+let quizSubmitted = false; // Track if the quiz has been submitted
 
 function loadQuestion(index) {
     const question = questions[index];
@@ -309,7 +342,13 @@ function loadQuestion(index) {
             button.classList.add('selected');
         }
 
-        button.onclick = () => selectOption(i);
+        // Disable buttons if the quiz is submitted
+        if (quizSubmitted) {
+            button.disabled = true;
+        } else {
+            button.onclick = () => selectOption(i);
+        }
+
         optionsContainer.appendChild(button);
     });
 
@@ -329,18 +368,21 @@ function selectOption(optionIndex) {
     const optionButtons = document.querySelectorAll('.option-btn');
     optionButtons[optionIndex].classList.add('selected');
     selectedOptionIndex = optionIndex; // Store the selected option index
-    // Mark this question as attempted when an option is selected
     selectedAnswers[currentQuestionIndex] = optionIndex; // Store the selected answer
-    // When an option is selected, mark the question as attempted
+
+    // Mark this question as attempted
+    if (markedForReview.has(currentQuestionIndex)) {
+        markedForReview.delete(currentQuestionIndex); // Remove from review if option selected
+    }
     attemptedQuestions.add(currentQuestionIndex);
     updateGridStatus(currentQuestionIndex, 'status-attempted');
 }
 
 function markForReview() {
-    if (!markedForReview.has(currentQuestionIndex)) {
-        markedForReview.add(currentQuestionIndex);
-        updateGridStatus(currentQuestionIndex, 'status-marked');
-    }
+    markedForReview.add(currentQuestionIndex);
+    updateGridStatus(currentQuestionIndex, 'status-marked'); // Set to yellow for review
+    // Remove from attemptedQuestions if it was previously added
+    attemptedQuestions.delete(currentQuestionIndex);
     nextQuestion(); // Move to the next question
 }
 
@@ -349,10 +391,13 @@ function clearSelectedAnswer() {
     selectedButtons.forEach(button => {
         button.classList.remove('selected');
     });
-    // Clear the selected answer and remove from attempted questions
+    // Clear the selected answer
     selectedAnswers[currentQuestionIndex] = null;
-    attemptedQuestions.delete(currentQuestionIndex);
-    updateGridStatus(currentQuestionIndex, 'status-unattempted');
+    // Update the grid status to unattempted if not marked for review
+    if (!markedForReview.has(currentQuestionIndex)) {
+        attemptedQuestions.delete(currentQuestionIndex);
+        updateGridStatus(currentQuestionIndex, 'status-unattempted');
+    }
 }
 
 function updateGridStatus(index, statusClass) {
@@ -368,13 +413,13 @@ function setupGrid() {
         btn.id = `q${index}`;
         btn.textContent = index + 1;
 
-        // Determine the class based on the question state
+        // Check for marked for review first
         if (markedForReview.has(index)) {
-            btn.className = 'status-marked';
+            btn.className = 'status-marked'; // Yellow for marked for review
         } else if (attemptedQuestions.has(index)) {
-            btn.className = 'status-attempted';
+            btn.className = 'status-attempted'; // Green for attempted
         } else {
-            btn.className = 'status-unattempted';
+            btn.className = 'status-unattempted'; // Default color for unattempted
         }
 
         btn.onclick = () => {
@@ -387,7 +432,19 @@ function setupGrid() {
 }
 
 function toggleSidebar() {
-    document.getElementById("sidebar").classList.toggle("open");
+    const sidebar = document.getElementById("sidebar");
+    const toggleButton = document.getElementById("toggle-btn");
+    const crossButton = document.getElementById("cross-btn");
+
+    sidebar.classList.toggle("open");
+
+    if (sidebar.classList.contains("open")) {
+        toggleButton.style.display = "none"; // Hide toggle button
+        crossButton.style.display = "block"; // Show cross button
+    } else {
+        toggleButton.style.display = "block"; // Show toggle button
+        crossButton.style.display = "none"; // Hide cross button
+    }
 }
 
 // Timer function (simple countdown)
@@ -408,15 +465,9 @@ function startTimer() {
 }
 
 function nextQuestion() {
-    // If no answer was selected, mark the question as unattempted in red
-    if (selectedOptionIndex === -1) {
-        updateGridStatus(currentQuestionIndex, 'status-unattempted-red');
-    } else {
-        // Mark as attempted only if not marked for review
-        if (!markedForReview.has(currentQuestionIndex)) {
-            attemptedQuestions.add(currentQuestionIndex); // Mark this question as attempted
-            updateGridStatus(currentQuestionIndex, 'status-attempted');
-        }
+    // Only update to unattempted-red if no option is selected and not marked for review
+    if (!markedForReview.has(currentQuestionIndex) && selectedAnswers[currentQuestionIndex] === null) {
+        updateGridStatus(currentQuestionIndex, 'status-unattempted-red'); // Mark as unattempted in red
     }
 
     if (currentQuestionIndex < questions.length - 1) {
@@ -431,11 +482,16 @@ function nextQuestion() {
         nextButton.onclick = submitTest; // Change functionality to submit the test
     }
 
-    // Reset selectedOptionIndex for next question
+    // Reset selectedOptionIndex for the next question
     selectedOptionIndex = -1;
 }
 
 function submitTest() {
+    if (quizSubmitted) {
+        alert("The quiz has already been submitted. You cannot change answers or resubmit.");
+        return;
+    }
+
     // Stop the timer
     clearInterval(timer);
 
@@ -470,6 +526,12 @@ function submitTest() {
 
     // Show results in the modal
     displayResults(score, totalQuestions, attemptedQuestions.size, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList);
+
+    // Mark quiz as submitted
+    quizSubmitted = true;
+
+    // Show the reattempt button in the sidebar
+    document.getElementById('reattempt-button').style.display = 'block';
 }
 
 function displayResults(score, totalQuestions, attemptedQuestionsCount, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList) {
@@ -508,8 +570,16 @@ function restartQuiz() {
     document.getElementById('timer').textContent = "1:00"; // Reset timer display
     startTimer(); // Start the timer
 
+    quizSubmitted = false; // Reset the submitted state
+
     setupGrid();
     loadQuestion(currentQuestionIndex);
+
+    // Hide the reattempt button
+    document.getElementById('reattempt-button').style.display = 'none';
+    
+    // Close the sidebar if open
+    document.getElementById("sidebar").classList.remove("open");
 }
 
 // Initialize
@@ -521,6 +591,8 @@ startTimer(); // Start the timer when the quiz begins
 document.getElementById('mark-review').onclick = markForReview;
 document.getElementById('clear-answer').onclick = clearSelectedAnswer;
 document.getElementById('next-question').onclick = nextQuestion;
+document.getElementById('reattempt-button').onclick = restartQuiz; // New reattempt button
+
 
 
 
