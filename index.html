@@ -142,11 +142,11 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background-color: #007bff;
+          /*  background-color: #007bff;
             color: white;
             padding: 10px 15px;
             border: none;
-            border-radius: 50px;
+            border-radius: 50px;*/
             font-size: 20px;
             cursor: pointer;
             z-index: 1100;
@@ -167,6 +167,13 @@
         .wrong-answer {
             color: red;
             font-weight: bold;
+        }
+        ul.results-list {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0;
+        }
+        ul.results-list li {
+            margin-bottom: 10px;
         }
 
         /* Responsive adjustments */
@@ -230,7 +237,8 @@
 <div class="container">
     <!-- Timer Bar -->
     <div class="timer-bar d-flex justify-content-between">
-        <span>Time Left: <span id="timer">1:00</span></span>
+        <span id="timer-label">Time Left: <span id="timer">1:00</span></span>
+        <span id="score-display" style="display: none;">Score: 0</span>
     </div>
 
     <!-- Quiz Section -->
@@ -249,6 +257,9 @@
 
         <!-- Answers Display Section -->
         <div id="answers-display" style="margin-top: 20px;"></div>
+
+        <!-- Results Button -->
+        <button class="btn btn-info w-100 mt-3" id="show-results" style="display: none;" onclick="showResultsModal()">Show Detailed Results</button>
     </div>
 </div>
 
@@ -295,8 +306,7 @@
 
 // Sample Questions Data
 const questions = [
-    
-  { text: "In which state is Jim Corbett National Park located?", options: ["Uttarakhand", "Madhya Pradesh", "Rajasthan", "Gujarat"], answer: 0 },
+    { text: "In which state is Jim Corbett National Park located?", options: ["Uttarakhand", "Madhya Pradesh", "Rajasthan", "Gujarat"], answer: 0 },
   { text: "Kaziranga National Park, famous for one-horned rhinoceros, is located in which Indian state?", options: ["Assam", "West Bengal", "Odisha", "Karnataka"], answer: 0 },
   { text: "Which national park is known as the 'Gateway of Chhattisgarh'?", options: ["Indravati National Park", "Kanha National Park", "Navegaon National Park", "Sanjay Gandhi National Park"], answer: 0 },
   { text: "Where is the Ranthambore National Park located?", options: ["Uttar Pradesh", "Maharashtra", "Rajasthan", "Haryana"], answer: 2 },
@@ -321,12 +331,9 @@ const questions = [
   { text: "The Rajaji National Park is located in which state?", options: ["Jharkhand", "Uttarakhand", "Maharashtra", "Karnataka"], answer: 1 },
   { text: "Which national park is also a UNESCO World Heritage Site in Assam?", options: ["Manas National Park", "Sundarbans National Park", "Valley of Flowers National Park", "Kanha National Park"], answer: 0 },
   { text: "The Silent Valley National Park is located in which Indian state?", options: ["Tamil Nadu", "Kerala", "Karnataka", "Andhra Pradesh"], answer: 1 }
-
 ];
 
-
-
-// Function to shuffle the questions array
+// Shuffle function
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -334,10 +341,8 @@ function shuffleArray(array) {
     }
 }
 
-// Shuffle questions when the quiz is initialized
+// Shuffle the questions
 shuffleArray(questions);
-
-
 
 let currentQuestionIndex = 0;
 let selectedOptionIndex = -1; // To track the selected option
@@ -349,7 +354,7 @@ let quizSubmitted = false; // Track if the quiz has been submitted
 
 function loadQuestion(index) {
     const question = questions[index];
-    document.getElementById('question').textContent = question.text;
+    document.getElementById('question').textContent = `Q${index + 1}: ${question.text}`;
     const optionsContainer = document.getElementById('options');
     optionsContainer.innerHTML = '';
 
@@ -386,11 +391,11 @@ function loadQuestion(index) {
     // Display selected and correct answers if quiz is submitted
     const answersDisplay = document.getElementById('answers-display');
     if (quizSubmitted) {
-        const selectedAnswer = selectedAnswers[index] !== null ? questions[index].options[selectedAnswers[index]] : "No Answer Selected";
-        const correctAnswer = questions[index].options[questions[index].answer];
+        const selectedAnswer = selectedAnswers[index] !== null ? question.options[selectedAnswers[index]] : "No Answer Selected";
+        const correctAnswer = question.options[question.answer];
 
         answersDisplay.innerHTML = `
-            <p>Your Answer: <span class="${selectedAnswers[index] === questions[index].answer ? 'correct-answer' : 'wrong-answer'}">${selectedAnswer}</span></p>
+            <p>Your Answer: <span class="${selectedAnswers[index] === question.answer ? 'correct-answer' : 'wrong-answer'}">${selectedAnswer}</span></p>
             <p>Correct Answer: <span class="correct-answer">${correctAnswer}</span></p>
         `;
     } else {
@@ -544,6 +549,7 @@ function submitTest() {
         if (attemptedQuestions.has(index)) {
             if (selectedAnswers[index] !== question.answer) {
                 wrongAnswersList.push({
+                    questionNumber: index + 1,
                     question: question.text,
                     selectedAnswer: question.options[selectedAnswers[index]],
                     correctAnswer: question.options[question.answer]
@@ -565,12 +571,23 @@ function submitTest() {
     // Mark quiz as submitted
     quizSubmitted = true;
 
+    // Display the score in the timer bar
+    document.getElementById('timer-label').style.display = 'none';
+    document.getElementById('score-display').style.display = 'block';
+    document.getElementById('score-display').textContent = `Score: ${score.toFixed(1)}`;
+
     // Show the reattempt button in the sidebar
     document.getElementById('reattempt-button').style.display = 'block';
+
+    // Show the results button
+    document.getElementById('show-results').style.display = 'block';
     
     // Load the first question to show answers
     currentQuestionIndex = 0;
     loadQuestion(currentQuestionIndex);
+
+    // Automatically show the results modal
+    showResultsModal();
 }
 
 function displayResults(score, totalQuestions, attemptedQuestionsCount, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList) {
@@ -582,14 +599,17 @@ function displayResults(score, totalQuestions, attemptedQuestionsCount, correctA
         <p>Correct Answers: ${correctAnswersCount}</p>
         <p>Marked for Review: ${markedForReview.size}</p>
         <p>Wrong Answers: ${wrongAnswersList.length}</p>
-        <ul>
+        <ul class="results-list">
             ${wrongAnswersList.map(answer => `
-                <li>${answer.question} 
+                <li><strong>Q${answer.questionNumber}:</strong> ${answer.question} 
                 <br>Your Answer: <span class="wrong-answer">${answer.selectedAnswer}</span> 
                 <br>Correct Answer: <span class="correct-answer">${answer.correctAnswer}</span>
                 </li>`).join('')}
         </ul>
     `;
+}
+
+function showResultsModal() {
     $('#resultsModal').modal('show'); // Show the modal with the results
 }
 
@@ -611,12 +631,19 @@ function restartQuiz() {
 
     quizSubmitted = false; // Reset the submitted state
 
+    // Hide score display and show timer again
+    document.getElementById('score-display').style.display = 'none';
+    document.getElementById('timer-label').style.display = 'block';
+
     setupGrid();
     loadQuestion(currentQuestionIndex);
 
     // Hide the reattempt button
     document.getElementById('reattempt-button').style.display = 'none';
     
+    // Hide the results button
+    document.getElementById('show-results').style.display = 'none';
+
     // Reset sidebar and toggle button visibility
     const sidebar = document.getElementById("sidebar");
     const toggleButton = document.getElementById("toggle-btn");
