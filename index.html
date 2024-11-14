@@ -8,14 +8,13 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* General Styles */
-      /* General Styles */
-body {
-    background-color: #f4f6f9;
-    font-family: Arial, sans-serif;
-    color: #333;
-    margin: 0;
-    padding: 0;
-}
+        body {
+            background-color: #f4f6f9;
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
         .container {
             max-width: 800px;
             margin-top: 20px;
@@ -139,31 +138,26 @@ body {
             background-color: #0056b3;
         }
         
-        
-        cross {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 50px;
-    font-size: 20px;
-    cursor: pointer;
-    z-index: 1100;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s;
-    display: none; /* Initially hidden */
-}
+        .cross {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1100;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+            display: none; /* Initially hidden */
+        }
 
-.cross:hover {
-    background-color: #0056b3;
-}
-        
-        
-        
-        
+        .cross:hover {
+            background-color: #0056b3;
+        }
 
         /* Results Modal Styles */
         .correct-answer {
@@ -175,11 +169,6 @@ body {
             font-weight: bold;
         }
 
-
-
-
-
-
         /* Responsive adjustments */
         @media (max-width: 767px) {
             .container {
@@ -189,53 +178,51 @@ body {
                 width: 100%;
             }
         }
-        
 
-/* Responsive adjustments for desktop */
-@media (min-width: 1024px) {
-    /* Use Flexbox for Main Layout */
-    .main-wrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        width: 100%;
-        padding: 0 20px; /* Add padding for left and right margins */
-    }
+        /* Responsive adjustments for desktop */
+        @media (min-width: 1024px) {
+            /* Use Flexbox for Main Layout */
+            .main-wrapper {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                width: 100%;
+                padding: 0 20px; /* Add padding for left and right margins */
+            }
 
-    /* Center the Container between Sidebar and Left Edge */
-    .container {
-        max-width: calc(100% - 600px); /* Calculate width based on sidebar and padding */
-        margin: 20px auto; /* Center within allocated space */
-        padding: 20px;
-        box-sizing: border-box;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+            /* Center the Container between Sidebar and Left Edge */
+            .container {
+                max-width: calc(100% - 600px); /* Calculate width based on sidebar and padding */
+                margin: 20px auto; /* Center within allocated space */
+                padding: 20px;
+                box-sizing: border-box;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
 
-    /* Sidebar fixed to the right */
-    .sidebar {
-        position: sticky;
-        top: 0;
-        margin-left: auto; /* Push sidebar to the right */
-        width: 300px; /* Specify a width for the sidebar */
-        height: 100vh;
-        overflow-y: auto;
-        background-color: #f8f9fa;
-        transition: right 0.4s ease;
-        box-shadow: -3px 0 10px rgba(0, 0, 0, 0.2);
-        padding: 20px;
-        z-index: 1000;
-    }
-}
+            /* Sidebar fixed to the right */
+            .sidebar {
+                position: sticky;
+                top: 0;
+                margin-left: auto; /* Push sidebar to the right */
+                width: 300px; /* Specify a width for the sidebar */
+                height: 100vh;
+                overflow-y: auto;
+                background-color: #f8f9fa;
+                transition: right 0.4s ease;
+                box-shadow: -3px 0 10px rgba(0, 0, 0, 0.2);
+                padding: 20px;
+                z-index: 1000;
+            }
+        }
 
-/* Ensure toggle button is hidden in desktop mode */
-@media (min-width: 1024px) {
-    .toggle-btn, #toggle-button, .sidebar-toggle, .cross {
-        display: none !important;
-    }
-}
-        
+        /* Ensure toggle button is hidden in desktop mode */
+        @media (min-width: 1024px) {
+            .toggle-btn, #toggle-button, .sidebar-toggle, .cross {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -259,6 +246,9 @@ body {
             <button class="btn btn-secondary" id="clear-answer">Clear</button>
             <button class="btn btn-primary" id="next-question">Save & Next</button>
         </div>
+
+        <!-- Answers Display Section -->
+        <div id="answers-display" style="margin-top: 20px;"></div>
     </div>
 </div>
 
@@ -302,21 +292,52 @@ body {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
- 
 
 // Sample Questions Data
 const questions = [
-    { text: "What is the capital of France?", options: ["Paris", "Rome", "Madrid", "Berlin"], answer: 0 },
-    { text: "Which planet is known as the Red Planet?", options: ["Earth", "Venus", "Mars", "Jupiter"], answer: 2 },
-    { text: "What is the largest mammal in the world?", options: ["Elephant", "Blue Whale", "Great White Shark", "Giraffe"], answer: 1 },
-    { text: "Which element has the chemical symbol 'O'?", options: ["Gold", "Oxygen", "Osmium", "Oganesson"], answer: 1 },
-    { text: "What year did the Titanic sink?", options: ["1912", "1914", "1905", "1900"], answer: 0 },
-    { text: "What is the smallest prime number?", options: ["0", "1", "2", "3"], answer: 2 },
-    { text: "Who wrote 'Romeo and Juliet'?", options: ["Charles Dickens", "William Shakespeare", "Mark Twain", "Leo Tolstoy"], answer: 1 },
-    { text: "What is the powerhouse of the cell?", options: ["Nucleus", "Mitochondria", "Ribosome", "Endoplasmic Reticulum"], answer: 1 },
-    { text: "Which continent is known as the 'Dark Continent'?", options: ["Asia", "Africa", "Australia", "South America"], answer: 1 },
-    { text: "What is the boiling point of water?", options: ["100°C", "90°C", "80°C", "120°C"], answer: 0 }
+    
+  { text: "In which state is Jim Corbett National Park located?", options: ["Uttarakhand", "Madhya Pradesh", "Rajasthan", "Gujarat"], answer: 0 },
+  { text: "Kaziranga National Park, famous for one-horned rhinoceros, is located in which Indian state?", options: ["Assam", "West Bengal", "Odisha", "Karnataka"], answer: 0 },
+  { text: "Which national park is known as the 'Gateway of Chhattisgarh'?", options: ["Indravati National Park", "Kanha National Park", "Navegaon National Park", "Sanjay Gandhi National Park"], answer: 0 },
+  { text: "Where is the Ranthambore National Park located?", options: ["Uttar Pradesh", "Maharashtra", "Rajasthan", "Haryana"], answer: 2 },
+  { text: "Sundarbans National Park is located in which Indian state?", options: ["Andhra Pradesh", "Odisha", "West Bengal", "Assam"], answer: 2 },
+  { text: "Which national park in India is known for its population of snow leopards?", options: ["Hemis National Park", "Bandhavgarh National Park", "Jim Corbett National Park", "Sariska National Park"], answer: 0 },
+  { text: "Bandipur National Park is located in which Indian state?", options: ["Tamil Nadu", "Karnataka", "Kerala", "Andhra Pradesh"], answer: 1 },
+  { text: "In which state is Periyar National Park situated?", options: ["Karnataka", "Kerala", "Tamil Nadu", "Telangana"], answer: 1 },
+  { text: "In which state is Kanha National Park located?", options: ["Madhya Pradesh", "Chhattisgarh", "Odisha", "Maharashtra"], answer: 0 },
+  { text: "Which national park is known as the 'Tiger Reserve of Rajasthan'?", options: ["Ranthambore National Park", "Keoladeo National Park", "Gir National Park", "Panna National Park"], answer: 0 },
+  { text: "In which state is Valley of Flowers National Park located?", options: ["Jammu and Kashmir", "Uttarakhand", "Himachal Pradesh", "Sikkim"], answer: 1 },
+  { text: "Manas National Park is famous for which animal?", options: ["Elephant", "One-horned Rhinoceros", "Royal Bengal Tiger", "Leopard"], answer: 1 },
+  { text: "Which national park in India has the largest population of lions?", options: ["Gir National Park", "Kanha National Park", "Sundarbans National Park", "Bandipur National Park"], answer: 0 },
+  { text: "Which of the following is a national park in Himachal Pradesh?", options: ["Great Himalayan National Park", "Nanda Devi National Park", "Manas National Park", "Ranthambore National Park"], answer: 0 },
+  { text: "Which national park is famous for its floating vegetation called 'Phumdis'?", options: ["Keibul Lamjao National Park", "Bandhavgarh National Park", "Kaziranga National Park", "Sundarbans National Park"], answer: 0 },
+  { text: "Where is the Sariska Tiger Reserve located?", options: ["Madhya Pradesh", "Gujarat", "Rajasthan", "Uttar Pradesh"], answer: 2 },
+  { text: "Nanda Devi National Park is located in which Indian state?", options: ["Uttarakhand", "Sikkim", "West Bengal", "Nagaland"], answer: 0 },
+  { text: "The Dachigam National Park is located in which Indian state?", options: ["Himachal Pradesh", "Jammu and Kashmir", "Punjab", "Uttarakhand"], answer: 1 },
+  { text: "Which national park is the first marine national park in India?", options: ["Gulf of Mannar Marine National Park", "Gulf of Kutch Marine National Park", "Sundarbans National Park", "Keoladeo National Park"], answer: 1 },
+  { text: "Which national park is known for its large population of swamp deer?", options: ["Kaziranga National Park", "Kanha National Park", "Jim Corbett National Park", "Bandipur National Park"], answer: 1 },
+  { text: "Panna National Park is located in which state?", options: ["Madhya Pradesh", "Rajasthan", "Uttar Pradesh", "Bihar"], answer: 0 },
+  { text: "Which national park is located in the Western Ghats and is known for the Nilgiri tahr?", options: ["Eravikulam National Park", "Periyar National Park", "Nagarhole National Park", "Silent Valley National Park"], answer: 0 },
+  { text: "The Rajaji National Park is located in which state?", options: ["Jharkhand", "Uttarakhand", "Maharashtra", "Karnataka"], answer: 1 },
+  { text: "Which national park is also a UNESCO World Heritage Site in Assam?", options: ["Manas National Park", "Sundarbans National Park", "Valley of Flowers National Park", "Kanha National Park"], answer: 0 },
+  { text: "The Silent Valley National Park is located in which Indian state?", options: ["Tamil Nadu", "Kerala", "Karnataka", "Andhra Pradesh"], answer: 1 }
+
 ];
+
+
+
+// Function to shuffle the questions array
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// Shuffle questions when the quiz is initialized
+shuffleArray(questions);
+
+
 
 let currentQuestionIndex = 0;
 let selectedOptionIndex = -1; // To track the selected option
@@ -360,6 +381,20 @@ function loadQuestion(index) {
     } else {
         nextButton.textContent = 'Save & Next';
         nextButton.onclick = nextQuestion;
+    }
+
+    // Display selected and correct answers if quiz is submitted
+    const answersDisplay = document.getElementById('answers-display');
+    if (quizSubmitted) {
+        const selectedAnswer = selectedAnswers[index] !== null ? questions[index].options[selectedAnswers[index]] : "No Answer Selected";
+        const correctAnswer = questions[index].options[questions[index].answer];
+
+        answersDisplay.innerHTML = `
+            <p>Your Answer: <span class="${selectedAnswers[index] === questions[index].answer ? 'correct-answer' : 'wrong-answer'}">${selectedAnswer}</span></p>
+            <p>Correct Answer: <span class="correct-answer">${correctAnswer}</span></p>
+        `;
+    } else {
+        answersDisplay.innerHTML = ''; // Clear the display if quiz has not been submitted
     }
 }
 
@@ -532,6 +567,10 @@ function submitTest() {
 
     // Show the reattempt button in the sidebar
     document.getElementById('reattempt-button').style.display = 'block';
+    
+    // Load the first question to show answers
+    currentQuestionIndex = 0;
+    loadQuestion(currentQuestionIndex);
 }
 
 function displayResults(score, totalQuestions, attemptedQuestionsCount, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList) {
@@ -578,8 +617,14 @@ function restartQuiz() {
     // Hide the reattempt button
     document.getElementById('reattempt-button').style.display = 'none';
     
-    // Close the sidebar if open
-    document.getElementById("sidebar").classList.remove("open");
+    // Reset sidebar and toggle button visibility
+    const sidebar = document.getElementById("sidebar");
+    const toggleButton = document.getElementById("toggle-btn");
+    const crossButton = document.getElementById("cross-btn");
+
+    sidebar.classList.remove("open");
+    toggleButton.style.display = "block"; // Show toggle button for mobile
+    crossButton.style.display = "none"; // Ensure cross button is hidden initially
 }
 
 // Initialize
@@ -592,10 +637,6 @@ document.getElementById('mark-review').onclick = markForReview;
 document.getElementById('clear-answer').onclick = clearSelectedAnswer;
 document.getElementById('next-question').onclick = nextQuestion;
 document.getElementById('reattempt-button').onclick = restartQuiz; // New reattempt button
-
-
-
-
 
 </script>
 
