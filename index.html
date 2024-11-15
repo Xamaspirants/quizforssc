@@ -686,8 +686,32 @@ function submitTest() {
 
     // Automatically show the results modal
     showResultsModal();
+
+    // Send data to Google Sheets
+    const studentName = document.getElementById('studentName').value;
+    const data = {
+        name: studentName,
+        score: score.toFixed(1)
+    };
+
+    console.log('Sending data to Google Sheets:', data);
+
+    fetch('https://script.google.com/macros/s/AKfycbwUqtlqGsVaPliXd97flqKcEA4vq4_eiKUgPkG_STB7BF3niEST78nY02YtZMHhHTvhSA/exec', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => console.log('Success:', data))
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
 
+
+    
 function displayResults(score, totalQuestions, attemptedQuestionsCount, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList) {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = `
