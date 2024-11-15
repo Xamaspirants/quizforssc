@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Quiz Interface</title>
+    <title>Quiz Interface</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* General Styles */
@@ -17,7 +17,22 @@
         }
         .container {
             max-width: 800px;
-            margin-top: 20px;
+            margin-top: 100px;
+            padding-top: 20px;
+        }
+        .header {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1100;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .question-card, .timer-bar {
             background-color: #fff;
@@ -26,8 +41,6 @@
             padding: 20px;
             margin-bottom: 20px;
         }
-
-        /* Timer Styles */
         .timer-bar {
             display: flex;
             justify-content: space-between;
@@ -35,14 +48,12 @@
             font-size: 18px;
             font-weight: bold;
             color: #007bff;
+            margin-top: 20px;
         }
-        
-        /* Question Section */
         .question-card h5 {
             font-size: 20px;
             font-weight: 600;
         }
-        
         .options button {
             background-color: #e9ecef;
             font-weight: 500;
@@ -60,34 +71,32 @@
             background-color: #28a745;
             color: white;
         }
-
-        /* Sidebar (Question Navigation) */
         .sidebar {
             position: fixed;
-            top: 0;
+            top: 60px;
             right: -100%;
             width: 80%;
             max-width: 400px;
-            height: 100%;
+            height: calc(100% - 60px);
             background-color: #f8f9fa;
             transition: right 0.4s ease;
             box-shadow: -3px 0 10px rgba(0, 0, 0, 0.2);
             padding: 20px;
             z-index: 1000;
+            
         }
         .sidebar.open {
             right: 0;
         }
-
         .sidebar-header {
             font-size: 18px;
             font-weight: bold;
             color: #007bff;
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
-
         .sidebar .question-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
@@ -114,15 +123,28 @@
             color: #fff;
         }
         .status-unattempted-red {
-            background-color: #dc3545; /* Red for unattempted questions */
+            background-color: #dc3545;
             color: #fff;
         }
-
-        /* Toggle Button */
+        .status-current {
+            border: 2px solid #007bff;
+        }
         .toggle-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+            display: none;
+        }
+        .toggle-btn:hover {
+            background-color: #003f7f;
+        }
+        .cross {
             background-color: #007bff;
             color: white;
             padding: 10px 15px;
@@ -133,33 +155,11 @@
             z-index: 1100;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s;
+            display: none;
         }
-        .toggle-btn:hover {
-            background-color: #0056b3;
-        }
-        
-        .cross {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-          /*  background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 50px;*/
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 1100;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s;
-            display: none; /* Initially hidden */
-        }
-
         .cross:hover {
             background-color: #0056b3;
         }
-
-        /* Results Modal Styles */
         .correct-answer {
             color: green;
             font-weight: bold;
@@ -169,14 +169,53 @@
             font-weight: bold;
         }
         ul.results-list {
-            list-style-type: none; /* Remove bullet points */
+            list-style-type: none;
             padding: 0;
         }
         ul.results-list li {
             margin-bottom: 10px;
         }
+        /* Landing Page Styles */
+        #landing-page {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+        #landing-page h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        #landing-page .form-group {
+            margin-bottom: 20px;
+        }
+        #landing-page input {
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+        }
+        #landing-page button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #landing-page button:hover {
+            background-color: #218838;
+        }
 
-        /* Responsive adjustments */
         @media (max-width: 767px) {
             .container {
                 padding: 0 15px;
@@ -184,56 +223,92 @@
             .sidebar {
                 width: 100%;
             }
+            .cross {
+                position: relative;
+                display: none;
+            }
+            .sidebar.open + .cross {
+                display: block;
+            }
+            .toggle-btn {
+                display: block;
+            }
         }
-
-        /* Responsive adjustments for desktop */
+        
+/* Adjustments for Tablet-like Screens (e.g., Nexus 7) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .toggle-btn {
+        display: block; /* Ensure the toggle button is visible */
+    }
+    .cross {
+        display: none; /* Ensure the cross button is hidden initially */
+    }
+    .header {
+        padding: 10px 15px; /* Adjust padding for better alignment */
+        justify-content: space-between;
+    }
+}
+        
+        
         @media (min-width: 1024px) {
-            /* Use Flexbox for Main Layout */
             .main-wrapper {
                 display: flex;
                 justify-content: space-between;
                 align-items: flex-start;
                 width: 100%;
-                padding: 0 20px; /* Add padding for left and right margins */
+                padding: 0 20px;
             }
-
-            /* Center the Container between Sidebar and Left Edge */
             .container {
-                max-width: calc(100% - 600px); /* Calculate width based on sidebar and padding */
-                margin: 20px auto; /* Center within allocated space */
+                max-width: calc(100% - 600px);
+                margin: 20px auto;
                 padding: 20px;
                 box-sizing: border-box;
                 background-color: #fff;
                 border-radius: 8px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             }
-
-            /* Sidebar fixed to the right */
+            .timer-bar{
+              margin-top: 50px;
+            }
             .sidebar {
                 position: sticky;
-                top: 0;
-                margin-left: auto; /* Push sidebar to the right */
-                width: 300px; /* Specify a width for the sidebar */
-                height: 100vh;
+                top: 100px;
+                margin-left: auto;
+                width: 300px;
+                height: calc(100vh - 100px);
                 overflow-y: auto;
                 background-color: #f8f9fa;
                 transition: right 0.4s ease;
                 box-shadow: -3px 0 10px rgba(0, 0, 0, 0.2);
                 padding: 20px;
                 z-index: 1000;
+                margin-top: 70px;
             }
-        }
-
-        /* Ensure toggle button is hidden in desktop mode */
-        @media (min-width: 1024px) {
-            .toggle-btn, #toggle-button, .sidebar-toggle, .cross {
-                display: none !important;
+            .toggle-btn {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-<div class="main-wrapper">
+<div class="header">
+    <h1 id="quiz-title">Quiz Application</h1>
+    <button class="toggle-btn" id="toggle-btn" onclick="toggleSidebar()">☰</button>
+    <button class="cross" id="cross-btn" onclick="toggleSidebar()">✕</button>
+</div>
+<div id="landing-page">
+    <div>
+        <h2 style="color: orange;">Welcome to the Xam Aspirants Quiz Challenge!</h2>
+        <p>Enter your name to begin the quiz and test your knowledge.</p>
+        <form id="start-quiz-form">
+            <div class="form-group">
+                <input type="text" id="studentName" class="form-control" placeholder="Your Name" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Start Quiz</button>
+        </form>
+    </div>
+</div>
+<div id="quiz-wrapper" class="main-wrapper" style="display: none;">
 <div class="container">
     <!-- Timer Bar -->
     <div class="timer-bar d-flex justify-content-between">
@@ -263,14 +338,10 @@
     </div>
 </div>
 
-<!-- Toggle Button for Sidebar -->
-<button class="toggle-btn" id="toggle-btn" onclick="toggleSidebar()">☰</button>
-
 <!-- Sidebar Navigation Panel -->
 <div id="sidebar" class="sidebar">
     <div class="sidebar-header">
         <span>Question Navigator</span>
-        <button class="cross" id="cross-btn" onclick="toggleSidebar()">✕</button>
     </div>
     <div class="question-grid" id="question-grid"></div>
     <button class="btn btn-primary w-100 mt-3" onclick="submitTest()">Submit Test</button>
@@ -303,7 +374,6 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-
 // Sample Questions Data
 const questions = [
     { text: "In which state is Jim Corbett National Park located?", options: ["Uttarakhand", "Madhya Pradesh", "Rajasthan", "Gujarat"], answer: 0 },
@@ -351,6 +421,18 @@ const attemptedQuestions = new Set(); // To track attempted questions
 const selectedAnswers = new Array(questions.length).fill(null); // Store selected answers
 let timer; // Timer variable
 let quizSubmitted = false; // Track if the quiz has been submitted
+
+// Handle quiz start
+document.getElementById('start-quiz-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const studentName = document.getElementById('studentName').value;
+    document.getElementById('quiz-title').textContent = studentName;
+    document.getElementById('landing-page').style.display = 'none';
+    document.getElementById('quiz-wrapper').style.display = 'flex';
+    startTimer();
+    setupGrid();
+    loadQuestion(currentQuestionIndex);
+});
 
 function loadQuestion(index) {
     const question = questions[index];
@@ -401,6 +483,19 @@ function loadQuestion(index) {
     } else {
         answersDisplay.innerHTML = ''; // Clear the display if quiz has not been submitted
     }
+
+    highlightCurrentGridButton(index);
+}
+
+function highlightCurrentGridButton(index) {
+    const gridButtons = document.querySelectorAll('.question-grid button');
+    gridButtons.forEach((button, i) => {
+        if (i === index) {
+            button.classList.add('status-current');
+        } else {
+            button.classList.remove('status-current');
+        }
+    });
 }
 
 function selectOption(optionIndex) {
@@ -469,6 +564,9 @@ function setupGrid() {
         };
         questionGrid.appendChild(btn);
     });
+
+    // Highlight the first question in the grid
+    highlightCurrentGridButton(currentQuestionIndex);
 }
 
 function toggleSidebar() {
@@ -480,7 +578,7 @@ function toggleSidebar() {
 
     if (sidebar.classList.contains("open")) {
         toggleButton.style.display = "none"; // Hide toggle button
-        crossButton.style.display = "block"; // Show cross button
+        crossButton.style.display = "block"; // Show cross button in mobile mode
     } else {
         toggleButton.style.display = "block"; // Show toggle button
         crossButton.style.display = "none"; // Hide cross button
@@ -657,7 +755,6 @@ function restartQuiz() {
 // Initialize
 setupGrid();
 loadQuestion(currentQuestionIndex);
-startTimer(); // Start the timer when the quiz begins
 
 // Add event listener for the buttons
 document.getElementById('mark-review').onclick = markForReview;
@@ -669,5 +766,6 @@ document.getElementById('reattempt-button').onclick = restartQuiz; // New reatte
 
 </body>
 </html>
+
 
 
