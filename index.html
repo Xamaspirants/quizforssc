@@ -635,7 +635,7 @@ function submitTest() {
 
     // Calculate score and gather results
     let score = 0;
-    let correctAnswersCount = 0; // Initialize correct answers count
+    let correctAnswersCount = 0;
     const totalQuestions = questions.length;
     const wrongAnswersList = [];
 
@@ -652,42 +652,32 @@ function submitTest() {
                     selectedAnswer: question.options[selectedAnswers[index]],
                     correctAnswer: question.options[question.answer]
                 });
-                // Apply negative marking for incorrect answers
                 score -= 0.5; // Deduct 0.5 points for a wrong answer
             } else {
                 score += 2; // Each correct answer is worth 2 points
-                correctAnswersCount++; // Increment correct answers count
+                correctAnswersCount++;
             }
         }
     });
 
     const notAttemptedQuestionsCount = totalQuestions - attemptedQuestions.size - markedForReview.size;
 
-    // Show results in the modal
     displayResults(score, totalQuestions, attemptedQuestions.size, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList);
 
-    // Mark quiz as submitted
     quizSubmitted = true;
 
-    // Display the score in the timer bar
     document.getElementById('timer-label').style.display = 'none';
     document.getElementById('score-display').style.display = 'block';
     document.getElementById('score-display').textContent = `Score: ${score.toFixed(1)}`;
 
-    // Show the reattempt button in the sidebar
     document.getElementById('reattempt-button').style.display = 'block';
-
-    // Show the results button
     document.getElementById('show-results').style.display = 'block';
     
-    // Load the first question to show answers
     currentQuestionIndex = 0;
     loadQuestion(currentQuestionIndex);
 
-    // Automatically show the results modal
     showResultsModal();
 
-    // Send data to Google Sheets
     const studentName = document.getElementById('studentName').value;
     const data = {
         name: studentName,
@@ -698,10 +688,10 @@ function submitTest() {
 
     fetch('https://script.google.com/macros/s/AKfycbwUqtlqGsVaPliXd97flqKcEA4vq4_eiKUgPkG_STB7BF3niEST78nY02YtZMHhHTvhSA/exec', {
         method: 'POST',
-        body: JSON.stringify(data),
         headers: {
-            'Content-Type': 'application/json'
-        }
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
     })
     .then(response => response.json())
     .then(data => console.log('Success:', data))
@@ -710,26 +700,17 @@ function submitTest() {
     });
 }
 
-
-    
-function displayResults(score, totalQuestions, attemptedQuestionsCount, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList) {
+function displayResults(score, totalQuestions, attemptedQuestions, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList) {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = `
         <h3>Your Score: ${score.toFixed(1)} out of ${totalQuestions * 2}</h3>
-        <p>Attempted Questions: ${attemptedQuestionsCount}</p>
-        <p>Not Attempted Questions: ${notAttemptedQuestionsCount}</p>
+        <p>Attempted Questions: ${attemptedQuestions}</p>
         <p>Correct Answers: ${correctAnswersCount}</p>
-        <p>Marked for Review: ${markedForReview.size}</p>
-        <p>Wrong Answers: ${wrongAnswersList.length}</p>
-        <ul class="results-list">
-            ${wrongAnswersList.map(answer => `
-                <li><strong>Q${answer.questionNumber}:</strong> ${answer.question} 
-                <br>Your Answer: <span class="wrong-answer">${answer.selectedAnswer}</span> 
-                <br>Correct Answer: <span class="correct-answer">${answer.correctAnswer}</span>
-                </li>`).join('')}
-        </ul>
+        <p>Not Attempted: ${notAttemptedQuestionsCount}</p>
+        <ul>${wrongAnswersList.map(item => `<li>Question ${item.questionNumber}: You answered '${item.selectedAnswer}', Correct answer is '${item.correctAnswer}'</li>`).join('')}</ul>
     `;
 }
+
 
 function showResultsModal() {
     $('#resultsModal').modal('show'); // Show the modal with the results
