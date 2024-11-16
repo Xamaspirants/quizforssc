@@ -19,21 +19,46 @@
             max-width: 800px;
             margin-top: 100px;
             padding-top: 20px;
+            margin-bottom: 70px;
         }
         .header {
             width: 100%;
             background-color: #007bff;
             color: white;
-            padding: 10px 15px;
+            padding: 5px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: fixed;
+          
             top: 0;
             left: 0;
             z-index: 1100;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+        
+        
+       .footer p {
+    background-color: #007bff;
+    color: white;
+    height: 60px; /* Fixed height for the footer */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+    width: 100%;
+    z-index: 1100;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    overflow: hidden;
+    padding: 0; /* Ensure no extra space is added */
+    margin: 0; /* Ensure no external margins affect layout */
+}
+  
+        
         .question-card, .timer-bar {
             background-color: #fff;
             border-radius: 8px;
@@ -48,7 +73,7 @@
             font-size: 18px;
             font-weight: bold;
             color: #007bff;
-            margin-top: 20px;
+           margin-top: -25px;
         }
         .question-card h5 {
             font-size: 20px;
@@ -234,6 +259,17 @@
                 display: block;
             }
         }
+   /* -------------------------------------------------------------------------------------------------------------*/   
+        /*Adding CSS*/
+        
+      /*  .modal-footer{
+          margin-bottom: 0px;
+        }*/
+        .modal-dialog{
+          margin-bottom: 50px;
+        }
+   /* ---------------------------------------------------------------------------------------------------------------*/  
+        
         
 /* Adjustments for Tablet-like Screens (e.g., Nexus 7) */
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -262,6 +298,7 @@
                 max-width: calc(100% - 600px);
                 margin: 20px auto;
                 padding: 20px;
+                margin-bottom: 70px;
                 box-sizing: border-box;
                 background-color: #fff;
                 border-radius: 8px;
@@ -272,8 +309,9 @@
             }
             .sidebar {
                 position: sticky;
-                top: 100px;
+              /*  top: 100px;*/
                 margin-left: auto;
+                margin-bottom: 50px;
                 width: 300px;
                 height: calc(100vh - 100px);
                 overflow-y: auto;
@@ -282,7 +320,7 @@
                 box-shadow: -3px 0 10px rgba(0, 0, 0, 0.2);
                 padding: 20px;
                 z-index: 1000;
-                margin-top: 70px;
+                margin-top: 60px;
             }
             .toggle-btn {
                 display: none;
@@ -292,7 +330,7 @@
 </head>
 <body>
 <div class="header">
-    <h1 id="quiz-title">Quiz Application</h1>
+    <h3 id="quiz-title">Quiz Application</h3>
     <button class="toggle-btn" id="toggle-btn" onclick="toggleSidebar()">☰</button>
     <button class="cross" id="cross-btn" onclick="toggleSidebar()">✕</button>
 </div>
@@ -369,6 +407,14 @@
     </div>
 </div>
 </div>
+
+
+<!-- Footer -->
+<footer class="footer bg-info">
+    
+        <p>&copy; 2024 Xam Aspirants. All rights reserved.</p>
+    
+</footer>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -376,7 +422,7 @@
 <script>
 // Sample Questions Data
 const questions = [
-    { text: "In which state is Jim Corbett National Park located?", options: ["Uttarakhand", "Madhya Pradesh", "Rajasthan", "Gujarat"], answer: 0 },
+  { text: "In which state is Jim Corbett National Park located?", options: ["Uttarakhand", "Madhya Pradesh", "Rajasthan", "Gujarat"], answer: 0 },
   { text: "Kaziranga National Park, famous for one-horned rhinoceros, is located in which Indian state?", options: ["Assam", "West Bengal", "Odisha", "Karnataka"], answer: 0 },
   { text: "Which national park is known as the 'Gateway of Chhattisgarh'?", options: ["Indravati National Park", "Kanha National Park", "Navegaon National Park", "Sanjay Gandhi National Park"], answer: 0 },
   { text: "Where is the Ranthambore National Park located?", options: ["Uttar Pradesh", "Maharashtra", "Rajasthan", "Haryana"], answer: 2 },
@@ -635,7 +681,7 @@ function submitTest() {
 
     // Calculate score and gather results
     let score = 0;
-    let correctAnswersCount = 0;
+    let correctAnswersCount = 0; // Initialize correct answers count
     const totalQuestions = questions.length;
     const wrongAnswersList = [];
 
@@ -652,65 +698,60 @@ function submitTest() {
                     selectedAnswer: question.options[selectedAnswers[index]],
                     correctAnswer: question.options[question.answer]
                 });
+                // Apply negative marking for incorrect answers
                 score -= 0.5; // Deduct 0.5 points for a wrong answer
             } else {
                 score += 2; // Each correct answer is worth 2 points
-                correctAnswersCount++;
+                correctAnswersCount++; // Increment correct answers count
             }
         }
     });
 
     const notAttemptedQuestionsCount = totalQuestions - attemptedQuestions.size - markedForReview.size;
 
+    // Show results in the modal
     displayResults(score, totalQuestions, attemptedQuestions.size, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList);
 
+    // Mark quiz as submitted
     quizSubmitted = true;
 
+    // Display the score in the timer bar
     document.getElementById('timer-label').style.display = 'none';
     document.getElementById('score-display').style.display = 'block';
     document.getElementById('score-display').textContent = `Score: ${score.toFixed(1)}`;
 
+    // Show the reattempt button in the sidebar
     document.getElementById('reattempt-button').style.display = 'block';
+
+    // Show the results button
     document.getElementById('show-results').style.display = 'block';
     
+    // Load the first question to show answers
     currentQuestionIndex = 0;
     loadQuestion(currentQuestionIndex);
 
+    // Automatically show the results modal
     showResultsModal();
-
-    const studentName = document.getElementById('studentName').value;
-    const data = {
-        name: studentName,
-        score: score.toFixed(1)
-    };
-
-    console.log('Sending data to Google Sheets:', data);
-
-    fetch('https://script.google.com/macros/s/AKfycbwUqtlqGsVaPliXd97flqKcEA4vq4_eiKUgPkG_STB7BF3niEST78nY02YtZMHhHTvhSA/exec', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(data => console.log('Success:', data))
-    .catch((error) => {
-        console.error('Error:', error);
-    });
 }
 
-function displayResults(score, totalQuestions, attemptedQuestions, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList) {
+function displayResults(score, totalQuestions, attemptedQuestionsCount, correctAnswersCount, notAttemptedQuestionsCount, wrongAnswersList) {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = `
         <h3>Your Score: ${score.toFixed(1)} out of ${totalQuestions * 2}</h3>
-        <p>Attempted Questions: ${attemptedQuestions}</p>
+        <p>Attempted Questions: ${attemptedQuestionsCount}</p>
+        <p>Not Attempted Questions: ${notAttemptedQuestionsCount}</p>
         <p>Correct Answers: ${correctAnswersCount}</p>
-        <p>Not Attempted: ${notAttemptedQuestionsCount}</p>
-        <ul>${wrongAnswersList.map(item => `<li>Question ${item.questionNumber}: You answered '${item.selectedAnswer}', Correct answer is '${item.correctAnswer}'</li>`).join('')}</ul>
+        <p>Marked for Review: ${markedForReview.size}</p>
+        <p>Wrong Answers: ${wrongAnswersList.length}</p>
+        <ul class="results-list">
+            ${wrongAnswersList.map(answer => `
+                <li><strong>Q${answer.questionNumber}:</strong> ${answer.question} 
+                <br>Your Answer: <span class="wrong-answer">${answer.selectedAnswer}</span> 
+                <br>Correct Answer: <span class="correct-answer">${answer.correctAnswer}</span>
+                </li>`).join('')}
+        </ul>
     `;
 }
-
 
 function showResultsModal() {
     $('#resultsModal').modal('show'); // Show the modal with the results
